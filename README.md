@@ -36,9 +36,23 @@ Endpoint	Method	Description
 /assets/<id>	DELETE	Delete an asset
 
 ##💡 Usage Example
+
 Register a User
 
 curl -X POST http://127.0.0.1:5000/register -H "Content-Type: application/json" \
 -d '{"username": "admin", "password": "securepass"}'
 
-##Add an IT Asset
+Add an IT Asset
+
+curl -X POST http://127.0.0.1:5000/assets -H "Content-Type: application/json" \
+-d '{"name": "Laptop", "category": "Electronics", "purchase_date": "2025-06-10", "warranty": "2 years", "assigned_to": "John Doe"}'
+
+Retrieve All Assets
+
+curl -X GET http://127.0.0.1:5000/assets
+
+🛠️ Future Enhancements
+🔹 Email Notifications for asset warranty expiry 🔹 Interactive Web Dashboard for visualizing asset usage 🔹 Role-Based Access Control for multi-user functionality
+
+🤝 Contributing
+Feel free to fork the repository and submit pull requests. For major changes, open an issue first.
