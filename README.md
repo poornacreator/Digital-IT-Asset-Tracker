@@ -1,12 +1,44 @@
-# Digital-IT-Asset-Tracker
+# 🖥️ Digital IT Asset Tracker
 
-## Features
+**A Flask-based IT Asset Management System** to track and manage IT assets efficiently, including purchase dates, warranty status, and user assignments.
 
-Dropdown-based asset status updates (30% faster Tracking)
+## 📌 Features
+✅ **User Authentication** (Secure Login & Registration)  
+✅ **Asset Management** (Add, View, Update, Delete)  
+✅ **Database Storage** (SQLite-based persistent storage)  
+✅ **REST API Endpoints** (Integration-ready for other systems)  
+✅ **User Assignment System** (Track assets per employee)  
 
-Real-time system monitoring (80% faster Troubleshooting)
+## 🚀 Installation & Setup
 
-ITSM compliant tracking System
+### **Prerequisites**
+Ensure you have the following installed:
+- Python 3.8+
+- Flask (`pip install flask`)
+- SQLite (Pre-installed with Python)
+
+### **Setup Instructions**
+```bash
+git clone https://github.com/your-repo/IT-Asset-Tracker.git
+cd IT-Asset-Tracker
+pip install flask
+python app.py
+
+##📌 The server will start at http://127.0.0.1:5000
 
 
+Endpoint	Method	Description
+/register	POST	User registration
+/login	POST	User authentication
+/assets	GET	Retrieve all assets
+/assets	POST	Add a new asset
+/assets/<id>	PUT	Update an asset
+/assets/<id>	DELETE	Delete an asset
 
+##💡 Usage Example
+Register a User
+
+curl -X POST http://127.0.0.1:5000/register -H "Content-Type: application/json" \
+-d '{"username": "admin", "password": "securepass"}'
+
+##Add an IT Asset
