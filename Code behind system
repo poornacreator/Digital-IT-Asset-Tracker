@@ -1,0 +1,105 @@
+from flask import Flask, request, jsonify
+import sqlite3
+import hashlib
+
+app = Flask(__name__)
+
+# Database setup
+def init_db():
+    conn = sqlite3.connect('assets.db')
+    cursor = conn.cursor()
+    cursor.execute('''CREATE TABLE IF NOT EXISTS users (
+                        id INTEGER PRIMARY KEY,
+                        username TEXT UNIQUE,
+                        password TEXT)''')
+    cursor.execute('''CREATE TABLE IF NOT EXISTS assets (
+                        id INTEGER PRIMARY KEY,
+                        name TEXT,
+                        category TEXT,
+                        purchase_date TEXT,
+                        warranty TEXT,
+                        assigned_to TEXT)''')
+    conn.commit()
+    conn.close()
+
+init_db()
+
+# Helper function for password hashing
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+# User registration
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    conn = sqlite3.connect('assets.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)",
+                       (data['username'], hash_password(data['password'])))
+        conn.commit()
+        return jsonify({"message": "User registered successfully!"}), 201
+    except:
+        return jsonify({"message": "Username already exists!"}), 400
+    finally:
+        conn.close()
+
+# User authentication
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    conn = sqlite3.connect('assets.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE username=? AND password=?",
+                   (data['username'], hash_password(data['password'])))
+    user = cursor.fetchone()
+    conn.close()
+    if user:
+        return jsonify({"message": "Login successful!"})
+    return jsonify({"message": "Invalid credentials!"}), 401
+
+# Add a new asset
+@app.route('/assets', methods=['POST'])
+def add_asset():
+    data = request.get_json()
+    conn = sqlite3.connect('assets.db')
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO assets (name, category, purchase_date, warranty, assigned_to) VALUES (?, ?, ?, ?, ?)",
+                   (data['name'], data['category'], data['purchase_date'], data['warranty'], data['assigned_to']))
+    conn.commit()
+    conn.close()
+    return jsonify({"message": "Asset added successfully!"}), 201
+
+# Retrieve all assets
+@app.route('/assets', methods=['GET'])
+def get_assets():
+    conn = sqlite3.connect('assets.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM assets")
+    assets = cursor.fetchall()
+    conn.close()
+    return jsonify(assets)
+
+# Update an asset
+@app.route('/assets/<int:asset_id>', methods=['PUT'])
+def update_asset(asset_id):
+    data = request.get_json()
+    conn = sqlite3.connect('assets.db')
+    cursor = conn.cursor()
+    cursor.execute("UPDATE assets SET name=?, category=?, purchase_date=?, warranty=?, assigned_to=? WHERE id=?",
+                   (data['name'], data['category'], data['purchase_date'], data['warranty'], data['assigned_to'], asset_id))
+    conn.commit()
+    conn.close()
+    return jsonify({"message": "Asset updated successfully!"})
+
+# Delete an asset
+@app.route('/assets/<int:asset_id>', methods=['DELETE'])
+def delete_asset(asset_id):
+    conn = sqlite3.connect('assets.db')
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM assets WHERE id=?", (asset_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({"message": "Asset deleted successfully!"})
+
+if __name__ == '__main__':
